@@ -24,10 +24,10 @@ public class Topology implements Serializable {
         builder.setSpout("Spout", new Spout(args[0], "BoltA"), 1);
 
         // Set Bolt
-        builder.setBolt("BoltA", new BoltA("BoltB"), 10).setNumTasks(10).fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
-        builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 25).setNumTasks(25).fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
-        builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
-        builder.setBolt("BoltE", new BoltE("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", "BoltE", new Fields("stream-2"));
+        builder.setBolt("BoltA", new BoltA("BoltB"), 15).setNumTasks(15).fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
+        builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 20).setNumTasks(20).fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
+        builder.setBolt("BoltC", new BoltC("BoltD"), 15).setNumTasks(15).fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
+        builder.setBolt("BoltE", new BoltE("BoltD"), 15).setNumTasks(15).fieldsGrouping("BoltB", "BoltE", new Fields("stream-2"));
         builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", "BoltD", new Fields("id-replica")).fieldsGrouping("BoltE", "BoltD",new Fields("id-replica"));
 
         try {
