@@ -20,7 +20,7 @@ public class BoltA implements IRichBolt, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(BoltA.class);
     private OutputCollector outputCollector;
     private Map mapConf;
-    private String id;q
+    private String id;
     private int[] array;
 
     private AtomicInteger numReplicas;
