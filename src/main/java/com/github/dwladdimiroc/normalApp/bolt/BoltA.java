@@ -68,7 +68,7 @@ public class BoltA implements IRichBolt, Serializable {
         long idReplica2 = 0;
 
         Values v = new Values(input.getValue(0), idReplica, idReplica1 , idReplica2);
-        this.outputCollector.emit(v);
+        this.outputCollector.emit("BoltB", v);
         this.outputCollector.ack(input);
     }
 

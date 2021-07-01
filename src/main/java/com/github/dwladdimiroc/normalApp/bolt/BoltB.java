@@ -74,9 +74,9 @@ public class BoltB implements IRichBolt, Serializable {
 
         Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
         if (events % 2 == 0) {
-            this.outputCollector.emit("stream1", v);
+            this.outputCollector.emit("BoltC", v);
         } else{
-            this.outputCollector.emit("stream2", v);
+            this.outputCollector.emit("BoltE", v);
         }
         this.outputCollector.ack(input);
     }
