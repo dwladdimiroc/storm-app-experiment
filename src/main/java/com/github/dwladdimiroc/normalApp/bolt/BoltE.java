@@ -77,7 +77,7 @@ public class BoltE implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number"));
+        declarer.declare(new Fields("number", "id-replica"));
     }
 
     @Override

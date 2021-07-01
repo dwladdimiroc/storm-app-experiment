@@ -28,7 +28,7 @@ public class Topology implements Serializable {
         builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 25).setNumTasks(25).fieldsGrouping("BoltA", new Fields("id-replica"));
         builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("id-replica"));
         builder.setBolt("BoltE", new BoltE("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("id-replica"));
-        builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", new Fields("id-replica"));
+        builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", new Fields("id-replica")).fieldsGrouping("BoltE", new Fields("id-replica"));
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
