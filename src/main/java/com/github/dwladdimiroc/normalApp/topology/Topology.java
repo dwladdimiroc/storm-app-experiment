@@ -26,8 +26,8 @@ public class Topology implements Serializable {
         // Set Bolt
         builder.setBolt("BoltA", new BoltA("BoltB"), 10).setNumTasks(10).fieldsGrouping("Spout", new Fields("id-replica"));
         builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 25).setNumTasks(25).fieldsGrouping("BoltA", new Fields("id-replica"));
-        builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("data-1"));
-        builder.setBolt("BoltE", new BoltE("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("stream-2"));
+        builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", "stream1", new Fields("data-1"));
+        builder.setBolt("BoltE", new BoltE("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", "stream2", new Fields("stream-2"));
         builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", new Fields("id-replica")).fieldsGrouping("BoltE", new Fields("id-replica"));
 
         try {

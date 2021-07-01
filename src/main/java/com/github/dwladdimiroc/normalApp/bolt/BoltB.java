@@ -1,6 +1,5 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.spout.Spout;
 import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -73,7 +72,11 @@ public class BoltB implements IRichBolt, Serializable {
         long idReplica2 = events % this.numReplicas2.get();
 
         Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
-        this.outputCollector.emit(v);
+        if (events % 2 == 0) {
+            this.outputCollector.emit("stream1", v);
+        } else{
+            this.outputCollector.emit("stream2", v);
+        }
         this.outputCollector.ack(input);
     }
 
@@ -85,7 +88,8 @@ public class BoltB implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("stream1", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("stream2", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override
