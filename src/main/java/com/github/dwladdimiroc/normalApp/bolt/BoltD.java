@@ -67,7 +67,7 @@ public class BoltD implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica"));
+        declarer.declare(new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override

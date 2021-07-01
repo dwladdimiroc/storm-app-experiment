@@ -23,7 +23,8 @@ public class BoltB implements IRichBolt, Serializable {
     private String id;
     private int[] array;
 
-    private AtomicInteger numReplicas;
+    private AtomicInteger numReplicas1;
+    private AtomicInteger numReplicas2;
     private long events;
     private String stream1;
     private String stream2;
@@ -45,11 +46,12 @@ public class BoltB implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        this.numReplicas = new AtomicInteger(1);
+        this.numReplicas1 = new AtomicInteger(1);
+        this.numReplicas2 = new AtomicInteger(2);
         this.events = 0;
-        Thread adaptiveBolt1 = new Thread(new Replicas(this.stream1, this.numReplicas));
+        Thread adaptiveBolt1 = new Thread(new Replicas(this.stream1, this.numReplicas1));
         adaptiveBolt1.start();
-        Thread adaptiveBolt2 = new Thread(new Replicas(this.stream2, this.numReplicas));
+        Thread adaptiveBolt2 = new Thread(new Replicas(this.stream2, this.numReplicas2));
         adaptiveBolt2.start();
         logger.info("Prepare BoltB");
     }
@@ -66,9 +68,11 @@ public class BoltB implements IRichBolt, Serializable {
             }
         }
 
-        long idReplica = events % this.numReplicas.get();
+        long idReplica = 0;
+        long idReplica1 = events % this.numReplicas1.get();
+        long idReplica2 = events % this.numReplicas2.get();
 
-        Values v = new Values(input.getValue(0), idReplica);
+        Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
         this.outputCollector.emit(v);
         this.outputCollector.ack(input);
     }
@@ -81,7 +85,7 @@ public class BoltB implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica"));
+        declarer.declare(new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override
