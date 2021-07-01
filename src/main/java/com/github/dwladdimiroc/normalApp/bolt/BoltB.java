@@ -25,11 +25,13 @@ public class BoltB implements IRichBolt, Serializable {
 
     private AtomicInteger numReplicas;
     private long events;
-    private String stream;
+    private String stream1;
+    private String stream2;
 
-    public BoltB(String stream) {
+    public BoltB(String stream1, String stream2) {
         logger.info("Constructor BoltB");
-        this.stream = stream;
+        this.stream1 = stream1;
+        this.stream2 = stream2;
     }
 
     @Override
@@ -45,16 +47,16 @@ public class BoltB implements IRichBolt, Serializable {
 
         this.numReplicas = new AtomicInteger(1);
         this.events = 0;
-        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
-        adaptiveBolt.start();
+        Thread adaptiveBolt1 = new Thread(new Replicas(this.stream1, this.numReplicas));
+        adaptiveBolt1.start();
+        Thread adaptiveBolt2 = new Thread(new Replicas(this.stream2, this.numReplicas));
+        adaptiveBolt2.start();
         logger.info("Prepare BoltB");
     }
 
     @Override
     public void execute(Tuple input) {
-//        logger.info("Process event");
         this.events++;
-//        Utils.sleep(1);
         int x = (int) (Math.random() * 1000);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < 100; j++) {

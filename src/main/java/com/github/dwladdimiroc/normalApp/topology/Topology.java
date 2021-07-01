@@ -1,9 +1,6 @@
 package com.github.dwladdimiroc.normalApp.topology;
 
-import com.github.dwladdimiroc.normalApp.bolt.BoltA;
-import com.github.dwladdimiroc.normalApp.bolt.BoltB;
-import com.github.dwladdimiroc.normalApp.bolt.BoltC;
-import com.github.dwladdimiroc.normalApp.bolt.BoltD;
+import com.github.dwladdimiroc.normalApp.bolt.*;
 import com.github.dwladdimiroc.normalApp.spout.Spout;
 import com.github.dwladdimiroc.normalApp.util.Redis;
 import org.apache.storm.Config;
@@ -28,8 +25,9 @@ public class Topology implements Serializable {
 
         // Set Bolt
         builder.setBolt("BoltA", new BoltA("BoltB"), 10).setNumTasks(10).fieldsGrouping("Spout", new Fields("id-replica"));
-        builder.setBolt("BoltB", new BoltB("BoltC"), 25).setNumTasks(25).fieldsGrouping("BoltA", new Fields("id-replica"));
+        builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 25).setNumTasks(25).fieldsGrouping("BoltA", new Fields("id-replica"));
         builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("id-replica"));
+        builder.setBolt("BoltE", new BoltE("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("id-replica"));
         builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", new Fields("id-replica"));
 
         try {

@@ -52,9 +52,7 @@ public class BoltC implements IRichBolt, Serializable {
 
     @Override
     public void execute(Tuple input) {
-//        logger.info("Process event");
         this.events++;
-//        Utils.sleep(2);
         int x = (int) (Math.random() * 1000);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < 100; j++) {
