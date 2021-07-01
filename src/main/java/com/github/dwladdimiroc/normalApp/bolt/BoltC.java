@@ -67,7 +67,7 @@ public class BoltC implements IRichBolt, Serializable {
         long idReplica2 = 0;
 
         Values v = new Values(input.getValue(0), idReplica, idReplica1 , idReplica2);
-        this.outputCollector.emit(v);
+        this.outputCollector.emit("BoltD", v);
         this.outputCollector.ack(input);
     }
 
@@ -79,7 +79,7 @@ public class BoltC implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltD", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override
