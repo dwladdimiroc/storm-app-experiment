@@ -25,6 +25,8 @@ public class BoltB implements IRichBolt, Serializable {
     private AtomicInteger numReplicas1;
     private AtomicInteger numReplicas2;
     private long events;
+    private long events1;
+    private long events2;
     private String stream1;
     private String stream2;
 
@@ -48,6 +50,8 @@ public class BoltB implements IRichBolt, Serializable {
         this.numReplicas1 = new AtomicInteger(1);
         this.numReplicas2 = new AtomicInteger(2);
         this.events = 0;
+        this.events1 = 0;
+        this.events2 = 0;
         Thread adaptiveBolt1 = new Thread(new Replicas(this.stream1, this.numReplicas1));
         adaptiveBolt1.start();
         Thread adaptiveBolt2 = new Thread(new Replicas(this.stream2, this.numReplicas2));
@@ -67,14 +71,19 @@ public class BoltB implements IRichBolt, Serializable {
             }
         }
 
-        long idReplica = 0;
-        long idReplica1 = events % this.numReplicas1.get();
-        long idReplica2 = events % this.numReplicas2.get();
-
-        Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
         if (events % 2 == 0) {
+            this.events1++;
+            long idReplica = 0;
+            long idReplica1 = this.events1 % this.numReplicas1.get();
+            long idReplica2 = this.events2 % this.numReplicas2.get();
+            Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
             this.outputCollector.emit("BoltC", v);
         } else{
+            this.events2++;
+            long idReplica = 0;
+            long idReplica1 = this.events1 % this.numReplicas1.get();
+            long idReplica2 = this.events2 % this.numReplicas2.get();
+            Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
             this.outputCollector.emit("BoltE", v);
         }
         this.outputCollector.ack(input);
