@@ -25,6 +25,12 @@ public class BoltF implements IRichBolt, Serializable {
 
     private AtomicInteger numReplicas;
     private long events;
+    private String stream;
+
+    public BoltF(String stream) {
+        logger.info("Constructor BoltF");
+        this.stream = stream;
+    }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -37,8 +43,10 @@ public class BoltF implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-//        this.numReplicas = new AtomicInteger(1);
-//        this.events = 0;
+        this.numReplicas = new AtomicInteger(1);
+        this.events = 0;
+        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
+        adaptiveBolt.start();
         logger.info("Prepare BoltF");
     }
 

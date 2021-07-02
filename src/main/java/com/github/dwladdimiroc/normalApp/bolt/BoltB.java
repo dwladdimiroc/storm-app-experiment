@@ -26,6 +26,8 @@ public class BoltB implements IRichBolt, Serializable {
     private AtomicInteger numReplicas1;
     private AtomicInteger numReplicas2;
     private long events;
+    private long events1;
+    private long events2;
     private String stream1;
     private String stream2;
 
@@ -47,7 +49,7 @@ public class BoltB implements IRichBolt, Serializable {
         }
 
         this.numReplicas1 = new AtomicInteger(1);
-        this.numReplicas2 = new AtomicInteger(2);
+        this.numReplicas2 = new AtomicInteger(1);
         this.events = 0;
         Thread adaptiveBolt1 = new Thread(new Replicas(this.stream1, this.numReplicas1));
         adaptiveBolt1.start();

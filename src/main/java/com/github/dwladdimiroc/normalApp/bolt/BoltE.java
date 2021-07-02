@@ -27,7 +27,7 @@ public class BoltE implements IRichBolt, Serializable {
     private String stream;
 
     public BoltE(String stream) {
-        logger.info("Constructor BoltC");
+        logger.info("Constructor BoltE");
         this.stream = stream;
     }
 
