@@ -25,12 +25,11 @@ public class Topology implements Serializable {
 
         // Set Spout
         builder.setSpout("Spout", new Spout(args[0], "BoltA"), 1);
-
         // Set Bolt
-        builder.setBolt("BoltA", new BoltA("BoltB"), 10).setNumTasks(10).fieldsGrouping("Spout", new Fields("id-replica"));
-        builder.setBolt("BoltB", new BoltB("BoltC"), 25).setNumTasks(25).fieldsGrouping("BoltA", new Fields("id-replica"));
-        builder.setBolt("BoltC", new BoltC("BoltD"), 20).setNumTasks(20).fieldsGrouping("BoltB", new Fields("id-replica"));
-        builder.setBolt("BoltD", new BoltD(), 10).setNumTasks(10).fieldsGrouping("BoltC", new Fields("id-replica"));
+        builder.setBolt("BoltA", new BoltA("BoltB"), 25).setNumTasks(25).fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
+        builder.setBolt("BoltB", new BoltB("BoltC"), 25).setNumTasks(25).fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
+        builder.setBolt("BoltC", new BoltC("BoltD"), 25).setNumTasks(25).fieldsGrouping("BoltB", "BoltC", new Fields("id-replica"));
+        builder.setBolt("BoltD", new BoltD(), 25).setNumTasks(25).fieldsGrouping("BoltC", "BoltD", new Fields("id-replica"));
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());

@@ -8,7 +8,6 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +64,8 @@ public class BoltC implements IRichBolt, Serializable {
         }
 
         long idReplica = events % this.numReplicas.get();
-
         Values v = new Values(input.getValue(0), idReplica);
-        this.outputCollector.emit(v);
+        this.outputCollector.emit("BoltD", v);
         this.outputCollector.ack(input);
     }
 
@@ -79,7 +77,7 @@ public class BoltC implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica"));
+        declarer.declareStream("BoltD", new Fields("number", "id-replica"));
     }
 
     @Override

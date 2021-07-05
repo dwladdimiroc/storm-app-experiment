@@ -132,8 +132,7 @@ public class Spout implements IRichSpout, Serializable {
         } else {
             long idReplica = this.events % this.numReplicas.get();
             Values values = new Values(Time.nanoTime(), idReplica);
-            this.collector.emit(values, values.get(0));
-//            this.collector.emit(values);
+            this.collector.emit("BoltA", values, values.get(0));
             this.events++;
         }
     }
@@ -148,7 +147,7 @@ public class Spout implements IRichSpout, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica"));
+        declarer.declareStream("BoltA", new Fields("number", "id-replica"));
     }
 
     @Override
