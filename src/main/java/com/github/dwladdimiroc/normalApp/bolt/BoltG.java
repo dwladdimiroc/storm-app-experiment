@@ -16,20 +16,15 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BoltC implements IRichBolt, Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(BoltC.class);
+public class BoltG implements IRichBolt, Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(BoltG.class);
     private OutputCollector outputCollector;
     private Map mapConf;
     private String id;
     private int[] array;
 
-    private AtomicInteger numReplicas;
-    private long events;
-    private String stream;
-
-    public BoltC(String stream) {
-        logger.info("Constructor BoltC");
-        this.stream = stream;
+    public BoltG(String stream) {
+        logger.info("Constructor BoltG");
     }
 
     @Override
@@ -38,21 +33,16 @@ public class BoltC implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[5000];
+        this.array = new int[15000];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }
 
-        this.numReplicas = new AtomicInteger(1);
-        this.events = 0;
-        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
-        adaptiveBolt.start();
-        logger.info("Prepare BoltC");
+        logger.info("Prepare BoltG");
     }
 
     @Override
     public void execute(Tuple input) {
-        this.events++;
         int x = (int) (Math.random() * 1000);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < 100; j++) {
@@ -62,12 +52,8 @@ public class BoltC implements IRichBolt, Serializable {
             }
         }
 
-        long idReplica = events % this.numReplicas.get();
-        long idReplica1 = 0;
-        long idReplica2 = 0;
-
-        Values v = new Values(input.getValue(0), idReplica, idReplica1 , idReplica2);
-        this.outputCollector.emit("BoltD", v);
+        Values v = new Values(input.getValue(0), 0, 0 , 0);
+        this.outputCollector.emit("BoltH", v);
         this.outputCollector.ack(input);
     }
 
@@ -79,7 +65,7 @@ public class BoltC implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("BoltD", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltH", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override

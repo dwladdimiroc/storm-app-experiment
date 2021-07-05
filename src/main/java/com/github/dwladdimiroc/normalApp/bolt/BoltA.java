@@ -38,7 +38,7 @@ public class BoltA implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[20000];
+        this.array = new int[5000];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }
@@ -53,7 +53,6 @@ public class BoltA implements IRichBolt, Serializable {
     @Override
     public void execute(Tuple input) {
         this.events++;
-//        Utils.sleep(5);
         int x = (int) (Math.random() * 1000);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < 100; j++) {
@@ -80,7 +79,7 @@ public class BoltA implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltB", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override

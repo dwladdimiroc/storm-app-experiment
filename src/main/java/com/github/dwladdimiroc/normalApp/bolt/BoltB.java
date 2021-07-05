@@ -1,6 +1,5 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.spout.Spout;
 import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -43,7 +42,7 @@ public class BoltB implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[40000];
+        this.array = new int[15000];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }
@@ -71,13 +70,17 @@ public class BoltB implements IRichBolt, Serializable {
         }
 
         long idReplica = 0;
-        long idReplica1 = events % this.numReplicas1.get();
-        long idReplica2 = events % this.numReplicas2.get();
-
-        Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
+        long idReplica1 = 0;
+        long idReplica2 = 0;
         if (events % 2 == 0) {
+            events1++;
+            idReplica1 = events1 % this.numReplicas1.get();
+            Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
             this.outputCollector.emit("BoltC", v);
-        } else{
+        } else {
+            events2++;
+            idReplica2 = events2 % this.numReplicas2.get();
+            Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
             this.outputCollector.emit("BoltE", v);
         }
         this.outputCollector.ack(input);
@@ -91,8 +94,8 @@ public class BoltB implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("stream1", new Fields("number", "id-replica", "data-1", "stream-2"));
-        declarer.declareStream("stream2", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltC", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltE", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override
