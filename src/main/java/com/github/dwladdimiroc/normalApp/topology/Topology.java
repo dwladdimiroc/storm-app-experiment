@@ -24,11 +24,11 @@ public class Topology implements Serializable {
         builder.setSpout("Spout", new Spout(args[0], "BoltA"), 1);
 
         // Set Bolt
-        builder.setBolt("BoltA", new BoltA("BoltB"), 25).setNumTasks(25).fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
-        builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 30).setNumTasks(30).fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
-        builder.setBolt("BoltC", new BoltC("BoltD"), 10).setNumTasks(10).fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
-        builder.setBolt("BoltE", new BoltE("BoltD"), 10).setNumTasks(10).fieldsGrouping("BoltB", "BoltE", new Fields("stream-2"));
-        builder.setBolt("BoltD", new BoltD(), 20).setNumTasks(20).fieldsGrouping("BoltC", "BoltD", new Fields("id-replica")).fieldsGrouping("BoltE", "BoltD",new Fields("id-replica"));
+        builder.setBolt("BoltA", new BoltA("BoltB"), 15).setNumTasks(15).fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
+        builder.setBolt("BoltB", new BoltB("BoltC", "BoltE"), 15).setNumTasks(15).fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
+        builder.setBolt("BoltC", new BoltC("BoltD"), 15).setNumTasks(15).fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
+        builder.setBolt("BoltE", new BoltE("BoltD"), 15).setNumTasks(15).fieldsGrouping("BoltB", "BoltE", new Fields("stream-2"));
+        builder.setBolt("BoltD", new BoltD(), 15).setNumTasks(15).fieldsGrouping("BoltC", "BoltD", new Fields("id-replica")).fieldsGrouping("BoltE", "BoltD",new Fields("id-replica"));
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
