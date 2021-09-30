@@ -38,7 +38,7 @@ public class BoltA implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[10000];
+        this.array = new int[2500];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }
@@ -64,8 +64,10 @@ public class BoltA implements IRichBolt, Serializable {
         }
 
         long idReplica = events % this.numReplicas.get();
+        long idReplica1 = 0;
+        long idReplica2 = 0;
 
-        Values v = new Values(input.getValue(0), idReplica);
+        Values v = new Values(input.getValue(0), idReplica, idReplica1 , idReplica2);
         this.outputCollector.emit("BoltB", v);
         this.outputCollector.ack(input);
     }

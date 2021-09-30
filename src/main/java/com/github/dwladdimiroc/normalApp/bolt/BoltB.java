@@ -42,7 +42,7 @@ public class BoltB implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[30000];
+        this.array = new int[20000];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }
