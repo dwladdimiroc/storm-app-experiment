@@ -25,16 +25,16 @@ public class Topology implements Serializable {
 
         // Set Bolt
         // Spout Twitter Streaming -> BoltA ParseData -> BoltB SpamDetector
-        builder.setBolt("BoltA", new BoltA("BoltB"), 10).setNumTasks(10).
+        builder.setBolt("BoltA", new BoltA("BoltB"), 5).setNumTasks(5).
                 fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
         // BoltA ParseData -> BoltB SpamDetector -> BoltC UserDetect || BoltF NewsDetector
         builder.setBolt("BoltB", new BoltB("BoltC", "BoltF"), 10).setNumTasks(10).
                 fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
         // BoltB SpamDetector -> BoltC UserDetect -> BoltD SendNotification
-        builder.setBolt("BoltC", new BoltC("BoltD"), 10).setNumTasks(10).
+        builder.setBolt("BoltC", new BoltC("BoltD"), 5).setNumTasks(5).
                 fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
         // BoltC UserDetect -> BoltD SendNotification -> BoltE DataSaved
-        builder.setBolt("BoltD", new BoltD("BoltE"), 10).setNumTasks(10)
+        builder.setBolt("BoltD", new BoltD("BoltE"), 5).setNumTasks(5)
                 .fieldsGrouping("BoltC", "BoltD", new Fields("id-replica"));
         // BoltD SendNotification || BoltG SentimentalClassified -> BoltE DataSaved -> ACK
         builder.setBolt("BoltE", new BoltE(), 10).setNumTasks(10)
@@ -48,7 +48,7 @@ public class Topology implements Serializable {
                 .fieldsGrouping("BoltF", "BoltG", new Fields("data-1"))
                 .fieldsGrouping("BoltH", "BoltG", new Fields("id-replica"));
         // BoltF NewsDetector -> BoltH Sentimental Classified -> BoltG TopicClassified
-        builder.setBolt("BoltH", new BoltH("BoltG"), 10).setNumTasks(10)
+        builder.setBolt("BoltH", new BoltH("BoltG"), 20).setNumTasks(20)
                 .fieldsGrouping("BoltF", "BoltH", new Fields("stream-2"));
 
         try {
