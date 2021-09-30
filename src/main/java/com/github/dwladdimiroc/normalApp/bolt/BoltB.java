@@ -71,20 +71,20 @@ public class BoltB implements IRichBolt, Serializable {
             }
         }
 
-        if (events % 2 == 0) {
+        if ((this.events % 10 == 0) || (this.events % 10 == 1)) {
             this.events1++;
             long idReplica = 0;
             long idReplica1 = this.events1 % this.numReplicas1.get();
             long idReplica2 = this.events2 % this.numReplicas2.get();
             Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
             this.outputCollector.emit("BoltC", v);
-        } else{
+        } else {
             this.events2++;
             long idReplica = 0;
             long idReplica1 = this.events1 % this.numReplicas1.get();
             long idReplica2 = this.events2 % this.numReplicas2.get();
             Values v = new Values(input.getValue(0), idReplica, idReplica1, idReplica2);
-            this.outputCollector.emit("BoltE", v);
+            this.outputCollector.emit("BoltF", v);
         }
         this.outputCollector.ack(input);
     }
@@ -98,7 +98,7 @@ public class BoltB implements IRichBolt, Serializable {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declareStream("BoltC", new Fields("number", "id-replica", "data-1", "stream-2"));
-        declarer.declareStream("BoltE", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltF", new Fields("number", "id-replica", "data-1", "stream-2"));
     }
 
     @Override
