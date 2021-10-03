@@ -38,7 +38,7 @@ public class BoltH implements IRichBolt, Serializable {
         this.outputCollector = collector;
         this.id = context.getThisComponentId();
 
-        this.array = new int[300000];
+        this.array = new int[150000];
         for (int i = 0; i < this.array.length; i++) {
             this.array[i] = i;
         }

@@ -24,30 +24,30 @@ public class Topology implements Serializable {
         // Set Bolt
         // Spout Twitter Streaming -> BoltA ParseData -> BoltB SpamDetector
         builder.setBolt("BoltA", new BoltA("BoltB"), 5).setNumTasks(5).
-                shuffleGrouping("Spout", "BoltA");
+                fieldsGrouping("Spout", "BoltA", "id-replica");
         // BoltA ParseData -> BoltB SpamDetector -> BoltC UserDetect || BoltF NewsDetector
         builder.setBolt("BoltB", new BoltB("BoltC", "BoltF"), 10).setNumTasks(10).
-                shuffleGrouping("BoltA", "BoltB");
+                fieldsGrouping("BoltA", "BoltB", "id-replica");
         // BoltB SpamDetector -> BoltC UserDetect -> BoltD SendNotification
         builder.setBolt("BoltC", new BoltC("BoltD"), 5).setNumTasks(5).
-                shuffleGrouping("BoltB", "BoltC");
+                fieldsGrouping("BoltB", "BoltC", "id-replica");
         // BoltC UserDetect -> BoltD SendNotification -> BoltE DataSaved
         builder.setBolt("BoltD", new BoltD("BoltE"), 5).setNumTasks(5)
-                .shuffleGrouping("BoltC", "BoltD");
+                .fieldsGrouping("BoltC", "BoltD", "id-replica");
         // BoltD SendNotification || BoltG SentimentalClassified -> BoltE DataSaved -> ACK
         builder.setBolt("BoltE", new BoltE(), 10).setNumTasks(10)
-                .shuffleGrouping("BoltD", "BoltE")
-                .shuffleGrouping("BoltG", "BoltE");
+                .fieldsGrouping("BoltD", "BoltE")
+                .fieldsGrouping("BoltG", "BoltE");
         // BoltB SpamDetector -> BoltF NewsDetector -> BoltG TopicClassified || BoltH SentimentalClassified
         builder.setBolt("BoltF", new BoltF("BoltG", "BoltH"), 10).setNumTasks(10)
-                .shuffleGrouping("BoltB", "BoltF");
+                .fieldsGrouping("BoltB", "BoltF", "id-replica");
         // BoltF NewsDetector || BoltH Sentimental Classified -> BoltG TopicClassified -> BoltE DataSaved
         builder.setBolt("BoltG", new BoltG("BoltE"), 10).setNumTasks(10)
-                .shuffleGrouping("BoltF", "BoltG")
-                .shuffleGrouping("BoltH", "BoltG");
+                .fieldsGrouping("BoltF", "BoltG")
+                .fieldsGrouping("BoltH", "BoltG");
         // BoltF NewsDetector -> BoltH Sentimental Classified -> BoltG TopicClassified
         builder.setBolt("BoltH", new BoltH("BoltG"), 20).setNumTasks(20)
-                .shuffleGrouping("BoltF", "BoltH");
+                .fieldsGrouping("BoltF", "BoltH", "id-replica");
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
