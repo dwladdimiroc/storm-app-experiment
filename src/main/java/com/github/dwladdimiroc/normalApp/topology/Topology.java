@@ -19,7 +19,7 @@ public class Topology implements Serializable {
     public static void main(String[] args) {
         Config config = new Config();
         config.setMessageTimeoutSecs(125);
-        config.setNumWorkers(3);
+        config.setNumWorkers(7);
 
         TopologyBuilder builder = new TopologyBuilder();
 
