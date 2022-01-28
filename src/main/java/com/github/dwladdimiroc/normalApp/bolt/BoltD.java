@@ -55,7 +55,8 @@ public class BoltD implements IRichBolt, Serializable {
                 }
             }
         }
-
+        String message = "Latency={"+input.getDouble(0)+"}";
+        logger.info(message);
         this.outputCollector.ack(input);
     }
 

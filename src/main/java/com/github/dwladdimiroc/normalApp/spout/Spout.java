@@ -136,7 +136,7 @@ public class Spout implements IRichSpout, Serializable {
             } else{
                 idReplica = this.events % 1;
             }
-            Values values = new Values(Time.nanoTime(), idReplica);
+            Values values = new Values(Time.currentTimeMillis(), idReplica);
             this.collector.emit("BoltA", values, values.get(0));
             this.events++;
         }
