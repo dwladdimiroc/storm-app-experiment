@@ -59,8 +59,8 @@ public class BoltD implements IRichBolt, Serializable {
         long timeInit = input.getLong(0);
         long timeFinal = Time.currentTimeMillis();
         long latency = timeFinal - timeInit;
-        String message = "Latency={"+latency+"}";
-        logger.info(message);
+        //String message = "Latency={"+latency+"}";
+        //logger.info(message);
         this.outputCollector.ack(input);
     }
 
