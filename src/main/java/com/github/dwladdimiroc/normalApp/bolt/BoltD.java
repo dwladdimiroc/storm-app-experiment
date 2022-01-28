@@ -8,6 +8,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.Time;
 import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,10 @@ public class BoltD implements IRichBolt, Serializable {
                 }
             }
         }
-        String message = "Latency={"+input.getDouble(0)+"}";
+        long timeInit = input.getLong(0);
+        long timeFinal = Time.currentTimeMillis();
+        long latency = timeFinal - timeInit;
+        String message = "Latency={"+latency+"}";
         logger.info(message);
         this.outputCollector.ack(input);
     }
