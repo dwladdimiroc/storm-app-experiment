@@ -17,12 +17,14 @@ public class Topology implements Serializable {
     public static final String TOPOLOGY_NAME = "normalApp";
     public static final int NUM_REPLICAS = 23;
     public static final int NUM_WORKERS = 7;
+    public static final int QUEUE_SIZE = 1000000;
 
     public static void main(String[] args) {
         Config config = new Config();
-        config.setMessageTimeoutSecs(60);
+        config.setMessageTimeoutSecs(360);
         config.setNumWorkers(NUM_WORKERS);
         config.setNumAckers(NUM_WORKERS);
+        config.setMaxSpoutPending(QUEUE_SIZE);
 
         TopologyBuilder builder = new TopologyBuilder();
 
