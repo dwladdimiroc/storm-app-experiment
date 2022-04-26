@@ -4,32 +4,29 @@ import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.github.dwladdimiroc.normalApp.topology.Topology.NUM_REPLICAS;
-
 public class Replica implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Replica.class);
 
     private final String name;
-    private final int id;
-    private boolean available;
+    private int numReplicas;
 
-    public Replica(String name, int id) {
+    public Replica(String name) {
+        logger.info("Replica PoolGrouping {}", name);
         this.name = name;
-        this.id = id;
-        this.available = false;
+        this.numReplicas = 0;
     }
 
-    public boolean isAvailable() {
-        return available;
+    public String getName(){return this.name;}
+
+    public int getNumReplicas() {
+        return this.numReplicas;
     }
 
     @Override
     public void run() {
         Redis redis = new Redis();
         while (true) {
-            int replicas = redis.getReplicas(this.name);
-            int numReplicas = id % NUM_REPLICAS;
-            available = numReplicas < replicas;
+            this.numReplicas = redis.getReplicas(this.name);
             Utils.sleep(1000);
         }
     }
