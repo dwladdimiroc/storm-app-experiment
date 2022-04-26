@@ -5,6 +5,7 @@ import com.github.dwladdimiroc.normalApp.bolt.BoltB;
 import com.github.dwladdimiroc.normalApp.bolt.BoltC;
 import com.github.dwladdimiroc.normalApp.bolt.BoltD;
 import com.github.dwladdimiroc.normalApp.spout.Spout;
+import com.github.dwladdimiroc.normalApp.util.PoolGrouping;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
@@ -14,13 +15,14 @@ import java.io.Serializable;
 
 public class Topology implements Serializable {
     public static final String TOPOLOGY_NAME = "normalApp";
-    public static final int NUM_REPLICAS = 5;
+    public static final int NUM_REPLICAS = 23;
+    public static final int NUM_WORKERS = 7;
 
     public static void main(String[] args) {
         Config config = new Config();
-        config.setMessageTimeoutSecs(120);
-//        config.setNumWorkers(7);
-        config.setNumWorkers(1);
+        config.setMessageTimeoutSecs(60);
+        config.setNumWorkers(NUM_WORKERS);
+        config.setNumAckers(NUM_WORKERS);
 
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -29,16 +31,16 @@ public class Topology implements Serializable {
 
         // Set Bolt
         builder.setBolt("BoltA", new BoltA("BoltB"), NUM_REPLICAS).setNumTasks(NUM_REPLICAS)
-                .shuffleGrouping("Spout", "BoltA");
+                .customGrouping("Spout", "BoltA", new PoolGrouping());
 
         builder.setBolt("BoltB", new BoltB("BoltC"), NUM_REPLICAS).setNumTasks(NUM_REPLICAS)
-                .shuffleGrouping("BoltA", "BoltB");
+                .customGrouping("BoltA", "BoltB", new PoolGrouping());
 
         builder.setBolt("BoltC", new BoltC("BoltD"), NUM_REPLICAS).setNumTasks(NUM_REPLICAS)
-                .shuffleGrouping("BoltB", "BoltC");
+                .customGrouping("BoltB", "BoltC", new PoolGrouping());
 
         builder.setBolt("BoltD", new BoltD(), NUM_REPLICAS).setNumTasks(NUM_REPLICAS)
-                .shuffleGrouping("BoltC", "BoltD");
+                .customGrouping("BoltC", "BoltD", new PoolGrouping());
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());
