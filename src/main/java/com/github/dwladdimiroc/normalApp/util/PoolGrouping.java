@@ -48,9 +48,14 @@ public class PoolGrouping implements LoadAwareCustomStreamGrouping {
 
     @Override
     public List<Integer> chooseTasks(int taskId, List<Object> values, LoadMapping load) {
+        int limit = this.replica.getNumReplicas();
+        if (targets.length < this.replica.getNumReplicas()){
+           limit = targets.length;
+        }
+
         if ((lastUpdate + 1000) < System.currentTimeMillis()) {
             int local_total = 0;
-            for (int i = 0; i < this.replica.getNumReplicas(); i++) {
+            for (int i = 0; i < limit; i++) {
                 int val = (int) (101 - (load.get(targets[i]) * 100));
                 loads[i] = val;
                 local_total += val;
@@ -60,7 +65,7 @@ public class PoolGrouping implements LoadAwareCustomStreamGrouping {
         }
         int selected = random.nextInt(total);
         int sum = 0;
-        for (int i = 0; i < this.replica.getNumReplicas(); i++) {
+        for (int i = 0; i < limit; i++) {
             sum += loads[i];
             if (selected < sum) {
                 return rets[i];
