@@ -10,7 +10,6 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.utils.Time;
-import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +23,6 @@ public class BoltD implements IRichBolt, Serializable {
     private String id;
     private int taskId;
     private int[] array;
-
-    private Replica replica;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
 
     public BoltD() {
         logger.info("Constructor BoltD");
@@ -43,42 +39,25 @@ public class BoltD implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        this.taskId = context.getThisTaskId();
-        logger.info("taskId: {}", taskId);
-        this.replica = new Replica(id, taskId);
-        Thread tReplica = new Thread(replica);
-        tReplica.start();
-
         logger.info("Prepare BoltD");
     }
 
     @Override
     public void execute(Tuple input) {
-        if (this.replica.isAvailable()) {
-            int x = (int) (Math.random() * 1000);
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < 100; j++) {
-                    if (x == array[i]) {
-                        x = x + j;
-                    }
+        int x = (int) (Math.random() * 1000);
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < 100; j++) {
+                if (x == array[i]) {
+                    x = x + j;
                 }
             }
-            addLatency(input);
-            this.outputCollector.ack(input);
-        } else {
-            while (!this.replica.isAvailable()) {
-                Utils.sleep(1000);
-            }
-            this.outputCollector.fail(input);
         }
+        this.outputCollector.ack(input);
     }
 
     @Override
     public void cleanup() {
         logger.info("Cleanup");
-        Redis redis = new Redis();
-        String idBolt = this.id + "-" + this.taskId;
-        redis.setLatency(idBolt, this.stats.getMean());
         System.runFinalization();
         System.gc();
     }
@@ -91,12 +70,5 @@ public class BoltD implements IRichBolt, Serializable {
     @Override
     public Map<String, Object> getComponentConfiguration() {
         return mapConf;
-    }
-
-    public void addLatency(Tuple input){
-        long timeI = input.getLong(0);
-        long timeF = Time.currentTimeMillis();
-        long latency = timeF - timeI;
-        this.stats.addValue((double) latency);
     }
 }

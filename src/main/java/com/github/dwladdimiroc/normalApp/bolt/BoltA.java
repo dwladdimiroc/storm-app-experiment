@@ -23,9 +23,6 @@ public class BoltA implements IRichBolt, Serializable {
     private int[] array;
     private String stream;
 
-    private Replica replica;
-
-
     public BoltA(String stream) {
         logger.info("Constructor BoltA");
         this.stream = stream;
@@ -42,37 +39,23 @@ public class BoltA implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        int taskId = context.getThisTaskId();
-        logger.info("taskId: {}", taskId);
-        this.replica = new Replica(id, taskId);
-        Thread tReplica = new Thread(replica);
-        tReplica.start();
-
         logger.info("Prepare BoltA");
     }
 
     @Override
     public void execute(Tuple input) {
-        if (this.replica.isAvailable()) {
-            logger.info("Execute {}", input);
-            int x = (int) (Math.random() * 1000);
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < 100; j++) {
-                    if (x == array[i]) {
-                        x = x + j;
-                    }
+        int x = (int) (Math.random() * 1000);
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < 100; j++) {
+                if (x == array[i]) {
+                    x = x + j;
                 }
             }
-
-            Values v = new Values(input.getValue(0));
-            this.outputCollector.emit(stream, v);
-            this.outputCollector.ack(input);
-        } else {
-            while (!this.replica.isAvailable()) {
-                Utils.sleep(1000);
-            }
-            this.outputCollector.fail(input);
         }
+
+        Values v = new Values(input.getValue(0));
+        this.outputCollector.emit(stream, v);
+        this.outputCollector.ack(input);
     }
 
     @Override

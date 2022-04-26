@@ -8,7 +8,6 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +21,6 @@ public class BoltB implements IRichBolt, Serializable {
     private String id;
     private int[] array;
     private String stream;
-
-    private Replica replica;
 
     public BoltB(String stream) {
         logger.info("Constructor BoltB");
@@ -41,36 +38,23 @@ public class BoltB implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        int taskId = context.getThisTaskId();
-        logger.info("taskId: {}", taskId);
-        this.replica = new Replica(id, taskId);
-        Thread tReplica = new Thread(replica);
-        tReplica.start();
-
         logger.info("Prepare BoltB");
     }
 
     @Override
     public void execute(Tuple input) {
-        if (this.replica.isAvailable()) {
-            int x = (int) (Math.random() * 1000);
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < 100; j++) {
-                    if (x == array[i]) {
-                        x = x + j;
-                    }
+        int x = (int) (Math.random() * 1000);
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < 100; j++) {
+                if (x == array[i]) {
+                    x = x + j;
                 }
             }
-
-            Values v = new Values(input.getValue(0));
-            this.outputCollector.emit(stream, v);
-            this.outputCollector.ack(input);
-        } else {
-            while (!this.replica.isAvailable()) {
-                Utils.sleep(1000);
-            }
-            this.outputCollector.fail(input);
         }
+
+        Values v = new Values(input.getValue(0));
+        this.outputCollector.emit(stream, v);
+        this.outputCollector.ack(input);
     }
 
     @Override
