@@ -2,10 +2,10 @@ package com.github.dwladdimiroc.normalApp.topology;
 
 import com.github.dwladdimiroc.normalApp.bolt.*;
 import com.github.dwladdimiroc.normalApp.spout.Spout;
+import com.github.dwladdimiroc.normalApp.util.PoolGrouping;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
 
 import java.io.Serializable;
 
@@ -14,8 +14,8 @@ public class Topology implements Serializable {
 
     public static void main(String[] args) {
         Config config = new Config();
-        config.setMessageTimeoutSecs(128);
-        config.setNumWorkers(3);
+        config.setMessageTimeoutSecs(360);
+        config.setNumWorkers(7);
 
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -24,31 +24,31 @@ public class Topology implements Serializable {
 
         // Set Bolt
         // Spout Twitter Streaming -> BoltA ParseData -> BoltB SpamDetector
-        builder.setBolt("BoltA", new BoltA("BoltB"), 5).setNumTasks(5).
-                fieldsGrouping("Spout", "BoltA", new Fields("id-replica"));
+        builder.setBolt("BoltA", new BoltA(), 5).setNumTasks(5).
+                customGrouping("Spout", "BoltA", new PoolGrouping());
         // BoltA ParseData -> BoltB SpamDetector -> BoltC UserDetect || BoltF NewsDetector
-        builder.setBolt("BoltB", new BoltB("BoltC", "BoltF"), 20).setNumTasks(20).
-                fieldsGrouping("BoltA", "BoltB", new Fields("id-replica"));
+        builder.setBolt("BoltB", new BoltB(), 20).setNumTasks(20).
+                customGrouping("BoltA", "BoltB", new PoolGrouping());
         // BoltB SpamDetector -> BoltC UserDetect -> BoltD SendNotification
-        builder.setBolt("BoltC", new BoltC("BoltD"), 5).setNumTasks(5).
-                fieldsGrouping("BoltB", "BoltC", new Fields("data-1"));
+        builder.setBolt("BoltC", new BoltC(), 5).setNumTasks(5).
+                customGrouping("BoltB", "BoltC", new PoolGrouping());
         // BoltC UserDetect -> BoltD SendNotification -> BoltE DataSaved
-        builder.setBolt("BoltD", new BoltD("BoltE"), 5).setNumTasks(5)
-                .fieldsGrouping("BoltC", "BoltD", new Fields("id-replica"));
+        builder.setBolt("BoltD", new BoltD(), 5).setNumTasks(5)
+                .customGrouping("BoltC", "BoltD", new PoolGrouping());
         // BoltD SendNotification || BoltG SentimentalClassified -> BoltE DataSaved -> ACK
         builder.setBolt("BoltE", new BoltE(), 10).setNumTasks(10)
-                .fieldsGrouping("BoltD", "BoltE", new Fields("data-1"))
-                .fieldsGrouping("BoltG", "BoltE", new Fields("stream-2"));
+                .customGrouping("BoltD", "BoltE", new PoolGrouping())
+                .customGrouping("BoltG", "BoltE", new PoolGrouping());
         // BoltB SpamDetector -> BoltF NewsDetector -> BoltG TopicClassified || BoltH SentimentalClassified
-        builder.setBolt("BoltF", new BoltF("BoltG", "BoltH"), 10).setNumTasks(10)
-                .fieldsGrouping("BoltB", "BoltF", new Fields("stream-2"));
+        builder.setBolt("BoltF", new BoltF(), 10).setNumTasks(10)
+                .customGrouping("BoltB", "BoltF", new PoolGrouping());
         // BoltF NewsDetector || BoltH Sentimental Classified -> BoltG TopicClassified -> BoltE DataSaved
-        builder.setBolt("BoltG", new BoltG("BoltE"), 10).setNumTasks(10)
-                .fieldsGrouping("BoltF", "BoltG", new Fields("data-1"))
-                .fieldsGrouping("BoltH", "BoltG", new Fields("id-replica"));
+        builder.setBolt("BoltG", new BoltG(), 10).setNumTasks(10)
+                .customGrouping("BoltF", "BoltG", new PoolGrouping())
+                .customGrouping("BoltH", "BoltG", new PoolGrouping());
         // BoltF NewsDetector -> BoltH Sentimental Classified -> BoltG TopicClassified
-        builder.setBolt("BoltH", new BoltH("BoltG"), 20).setNumTasks(20)
-                .fieldsGrouping("BoltF", "BoltH", new Fields("stream-2"));
+        builder.setBolt("BoltH", new BoltH(), 20).setNumTasks(20)
+                .customGrouping("BoltF", "BoltH", new PoolGrouping());
 
         try {
             StormSubmitter.submitTopology(TOPOLOGY_NAME, config, builder.createTopology());

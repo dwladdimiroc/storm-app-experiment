@@ -1,19 +1,16 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichBolt;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoltE implements IRichBolt, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(BoltE.class);
@@ -22,7 +19,6 @@ public class BoltE implements IRichBolt, Serializable {
     private String id;
     private int[] array;
 
-    private AtomicInteger numReplicas;
     private long events;
 
     public BoltE() {
@@ -41,10 +37,7 @@ public class BoltE implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        this.numReplicas = new AtomicInteger(1);
         this.events = 0;
-//        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
-//        adaptiveBolt.start();
         logger.info("Prepare BoltE");
     }
 
@@ -70,7 +63,7 @@ public class BoltE implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("BoltE", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltE", new Fields("time"));
     }
 
     @Override

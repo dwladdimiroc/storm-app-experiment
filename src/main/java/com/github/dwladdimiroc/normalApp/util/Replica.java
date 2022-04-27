@@ -11,7 +11,7 @@ public class Replica implements Runnable {
     private int numReplicas;
 
     public Replica(String name) {
-        logger.info("Replica PoolGrouping {}", name);
+        logger.info("PoolGrouping {}", name);
         this.name = name;
         this.numReplicas = 0;
     }
