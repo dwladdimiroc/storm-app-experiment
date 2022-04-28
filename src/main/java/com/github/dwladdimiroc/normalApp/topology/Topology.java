@@ -23,30 +23,30 @@ public class Topology implements Serializable {
 
         // Set Bolt
         // Spout Twitter Streaming -> BoltA ParseData -> BoltB SpamDetector
-        builder.setBolt("BoltA", new BoltA("BoltB"), 5).setNumTasks(5).
+        builder.setBolt("BoltA", new BoltA(), 5).setNumTasks(5).
                 shuffleGrouping("Spout", "BoltA");
         // BoltA ParseData -> BoltB SpamDetector -> BoltC UserDetect || BoltF NewsDetector
-        builder.setBolt("BoltB", new BoltB("BoltC", "BoltF"), 10).setNumTasks(10).
+        builder.setBolt("BoltB", new BoltB(), 10).setNumTasks(10).
                 shuffleGrouping("BoltA", "BoltB");
         // BoltB SpamDetector -> BoltC UserDetect -> BoltD SendNotification
-        builder.setBolt("BoltC", new BoltC("BoltD"), 5).setNumTasks(5).
+        builder.setBolt("BoltC", new BoltC(), 5).setNumTasks(5).
                 shuffleGrouping("BoltB", "BoltC");
         // BoltC UserDetect -> BoltD SendNotification -> BoltE DataSaved
-        builder.setBolt("BoltD", new BoltD("BoltE"), 5).setNumTasks(5)
+        builder.setBolt("BoltD", new BoltD(), 5).setNumTasks(5)
                 .shuffleGrouping("BoltC", "BoltD");
         // BoltD SendNotification || BoltG SentimentalClassified -> BoltE DataSaved -> ACK
         builder.setBolt("BoltE", new BoltE(), 10).setNumTasks(10)
                 .shuffleGrouping("BoltD", "BoltE")
                 .shuffleGrouping("BoltG", "BoltE");
         // BoltB SpamDetector -> BoltF NewsDetector -> BoltG TopicClassified || BoltH SentimentalClassified
-        builder.setBolt("BoltF", new BoltF("BoltG", "BoltH"), 10).setNumTasks(10)
+        builder.setBolt("BoltF", new BoltF(), 10).setNumTasks(10)
                 .shuffleGrouping("BoltB", "BoltF");
         // BoltF NewsDetector || BoltH Sentimental Classified -> BoltG TopicClassified -> BoltE DataSaved
-        builder.setBolt("BoltG", new BoltG("BoltE"), 10).setNumTasks(10)
+        builder.setBolt("BoltG", new BoltG(), 10).setNumTasks(10)
                 .shuffleGrouping("BoltF", "BoltG")
                 .shuffleGrouping("BoltH", "BoltG");
         // BoltF NewsDetector -> BoltH Sentimental Classified -> BoltG TopicClassified
-        builder.setBolt("BoltH", new BoltH("BoltG"), 20).setNumTasks(20)
+        builder.setBolt("BoltH", new BoltH(), 20).setNumTasks(20)
                 .shuffleGrouping("BoltF", "BoltH");
 
         try {

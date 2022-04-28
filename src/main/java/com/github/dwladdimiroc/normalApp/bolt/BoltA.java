@@ -1,7 +1,5 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.spout.Spout;
-import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichBolt;
@@ -23,13 +21,8 @@ public class BoltA implements IRichBolt, Serializable {
     private String id;
     private int[] array;
 
-    private AtomicInteger numReplicas;
-    private long events;
-    private String stream;
-
-    public BoltA(String stream) {
+    public BoltA() {
         logger.info("Constructor BoltA");
-        this.stream = stream;
     }
 
     @Override
@@ -43,17 +36,11 @@ public class BoltA implements IRichBolt, Serializable {
             this.array[i] = i;
         }
 
-        this.numReplicas = new AtomicInteger(1);
-        this.events = 0;
-        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
-        adaptiveBolt.start();
         logger.info("Prepare BoltA");
     }
 
     @Override
     public void execute(Tuple input) {
-        this.events++;
-//        Utils.sleep(5);
         int x = (int) (Math.random() * 1000);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < 100; j++) {
@@ -63,11 +50,7 @@ public class BoltA implements IRichBolt, Serializable {
             }
         }
 
-        long idReplica = events % this.numReplicas.get();
-        long idReplica1 = 0;
-        long idReplica2 = 0;
-
-        Values v = new Values(input.getValue(0), idReplica, idReplica1 , idReplica2);
+        Values v = new Values(input.getValue(0));
         this.outputCollector.emit("BoltB", v);
         this.outputCollector.ack(input);
     }
@@ -80,7 +63,7 @@ public class BoltA implements IRichBolt, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("BoltB", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltB", new Fields("time"));
     }
 
     @Override
