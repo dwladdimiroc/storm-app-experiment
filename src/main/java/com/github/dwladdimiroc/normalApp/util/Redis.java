@@ -15,4 +15,22 @@ public class Redis {
             return Integer.parseInt(cachedResponse);
         }
     }
+
+    public int getInputIndex() {
+        Jedis jedis = new Jedis(REDIS_HOST);
+        String cachedResponse = jedis.get("inputIndex");
+        jedis.close();
+        if (cachedResponse == null) {
+            return 0;
+        } else {
+            return Integer.parseInt(cachedResponse);
+        }
+    }
+
+    public void setInputIndex(int index) {
+        Jedis jedis = new Jedis(REDIS_HOST);
+        String cachedResponse = jedis.set("inputIndex", String.valueOf(index));
+        jedis.close();
+        System.out.println(cachedResponse);
+    }
 }

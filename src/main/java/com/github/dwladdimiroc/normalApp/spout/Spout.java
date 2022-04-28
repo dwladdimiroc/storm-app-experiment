@@ -1,6 +1,7 @@
 package com.github.dwladdimiroc.normalApp.spout;
 
 import com.github.dwladdimiroc.normalApp.util.Distribution;
+import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichSpout;
@@ -24,12 +25,19 @@ public class Spout implements IRichSpout, Serializable {
     private SpoutOutputCollector collector;
 
     private LinkedBlockingQueue<Integer> queue;
-    private final String distribution;
+    private String distribution;
     private float[] samples;
     private int indexSamples;
 
+    private AtomicInteger numReplicas;
+    private long events;
+    private String stream;
+
+    private String id;
+
     public Spout(String distribution, String stream) {
         this.distribution = distribution;
+        this.stream = stream;
     }
 
     @Override
@@ -37,10 +45,17 @@ public class Spout implements IRichSpout, Serializable {
         this.conf = conf;
         this.context = context;
         this.collector = collector;
-        this.queue = new LinkedBlockingQueue<Integer>(500000);
+        this.id = context.getThisComponentId();
+        this.queue = new LinkedBlockingQueue<Integer>(100000);
+
+        this.numReplicas = new AtomicInteger(1);
+        this.events = 0;
+        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
+        adaptiveBolt.start();
 
         Distribution file = new Distribution(this.distribution);
         this.samples = file.Input();
+
         this.indexSamples = 0;
 
         Thread createTuples = new Thread(new TuplesCreator());
@@ -86,8 +101,15 @@ public class Spout implements IRichSpout, Serializable {
         if (nums == null) {
             Utils.sleep(10);
         } else {
-            Values values = new Values(Time.currentTimeMillis());
+            long idReplica;
+            if (this.numReplicas.get() > 0) {
+                idReplica = this.events % this.numReplicas.get();
+            } else{
+                idReplica = this.events % 1;
+            }
+            Values values = new Values(Time.nanoTime(), idReplica);
             this.collector.emit("BoltA", values, values.get(0));
+            this.events++;
         }
     }
 
@@ -101,7 +123,7 @@ public class Spout implements IRichSpout, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("BoltA", new Fields("time"));
+        declarer.declareStream("BoltA", new Fields("number", "id-replica"));
     }
 
     @Override
