@@ -18,10 +18,11 @@ public class Topology implements Serializable {
     public static final int NUM_REPLICAS = 23;
     public static final int NUM_WORKERS = 7;
     public static final int QUEUE_SIZE = 1000000;
+    public static final int TIMEOUT = 360;
 
     public static void main(String[] args) {
         Config config = new Config();
-        config.setMessageTimeoutSecs(360);
+        config.setMessageTimeoutSecs(TIMEOUT);
         config.setNumWorkers(NUM_WORKERS);
         config.setNumAckers(NUM_WORKERS);
         config.setMaxSpoutPending(QUEUE_SIZE);
