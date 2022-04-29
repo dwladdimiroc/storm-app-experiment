@@ -12,6 +12,7 @@ import org.apache.storm.StormSubmitter;
 import org.apache.storm.topology.TopologyBuilder;
 
 import java.io.Serializable;
+import java.sql.Time;
 
 public class Topology implements Serializable {
     public static final String TOPOLOGY_NAME = "normalApp";
@@ -19,6 +20,7 @@ public class Topology implements Serializable {
     public static final int NUM_WORKERS = 7;
     public static final int QUEUE_SIZE = 1000000;
     public static final int TIMEOUT = 360;
+    public static final int TIMEOUT_MS = TIMEOUT*1000;
 
     public static void main(String[] args) {
         Config config = new Config();

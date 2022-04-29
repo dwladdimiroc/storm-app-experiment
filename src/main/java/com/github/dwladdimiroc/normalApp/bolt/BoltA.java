@@ -1,6 +1,6 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.util.Replica;
+import com.github.dwladdimiroc.normalApp.topology.Topology;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichBolt;
@@ -8,7 +8,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import org.apache.storm.utils.Utils;
+import org.apache.storm.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,18 +44,25 @@ public class BoltA implements IRichBolt, Serializable {
 
     @Override
     public void execute(Tuple input) {
-        int x = (int) (Math.random() * 1000);
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < 100; j++) {
-                if (x == array[i]) {
-                    x = x + j;
+        long timestamp = input.getLong(0);
+        long currentTime = Time.currentTimeMillis();
+        long timeout = currentTime - timestamp;
+        if (timeout < Topology.TIMEOUT_MS) {
+            int x = (int) (Math.random() * 1000);
+            for (int i = 0; i < array.length; i++) {
+                for (int j = 0; j < 100; j++) {
+                    if (x == array[i]) {
+                        x = x + j;
+                    }
                 }
             }
-        }
 
-        Values v = new Values(input.getValue(0));
-        this.outputCollector.emit(stream, v);
-        this.outputCollector.ack(input);
+            Values v = new Values(timestamp);
+            this.outputCollector.emit(stream, v);
+            this.outputCollector.ack(input);
+        } else {
+            this.outputCollector.fail(input);
+        }
     }
 
     @Override
