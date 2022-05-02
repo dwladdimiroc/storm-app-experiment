@@ -7,12 +7,10 @@ import com.github.dwladdimiroc.normalApp.bolt.BoltD;
 import com.github.dwladdimiroc.normalApp.spout.Spout;
 import com.github.dwladdimiroc.normalApp.util.PoolGrouping;
 import org.apache.storm.Config;
-import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.topology.TopologyBuilder;
 
 import java.io.Serializable;
-import java.sql.Time;
 
 public class Topology implements Serializable {
     public static final String TOPOLOGY_NAME = "normalApp";
