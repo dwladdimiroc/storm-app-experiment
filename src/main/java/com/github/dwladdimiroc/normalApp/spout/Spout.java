@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.github.dwladdimiroc.normalApp.topology.Topology.QUEUE_SIZE;
 
 public class Spout implements IRichSpout, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(Spout.class);
@@ -27,8 +28,10 @@ public class Spout implements IRichSpout, Serializable {
     private final String distribution;
     private float[] samples;
     private int indexSamples;
+    private String stream;
 
     public Spout(String distribution, String stream) {
+        this.stream = stream;
         this.distribution = distribution;
     }
 
@@ -37,7 +40,7 @@ public class Spout implements IRichSpout, Serializable {
         this.conf = conf;
         this.context = context;
         this.collector = collector;
-        this.queue = new LinkedBlockingQueue<Integer>(500000);
+        this.queue = new LinkedBlockingQueue<Integer>(100000);
 
         Distribution file = new Distribution(this.distribution);
         this.samples = file.Input();
@@ -87,7 +90,7 @@ public class Spout implements IRichSpout, Serializable {
             Utils.sleep(10);
         } else {
             Values values = new Values(Time.currentTimeMillis());
-            this.collector.emit("BoltA", values, values.get(0));
+            this.collector.emit(stream, values, values.get(0));
         }
     }
 
