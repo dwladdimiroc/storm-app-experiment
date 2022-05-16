@@ -1,7 +1,6 @@
 package com.github.dwladdimiroc.normalApp.spout;
 
 import com.github.dwladdimiroc.normalApp.util.Distribution;
-import com.github.dwladdimiroc.normalApp.util.Redis;
 import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -57,9 +56,7 @@ public class Spout implements IRichSpout, Serializable {
         Distribution file = new Distribution(this.distribution);
         this.samples = file.Input();
 
-        Redis redis = new Redis();
-        this.indexSamples = redis.getInputIndex();
-        logger.info("Open Redis IndexSamples: " + this.indexSamples);
+        this.indexSamples = 0;
 
         Thread createTuples = new Thread(new TuplesCreator());
         createTuples.start();
@@ -78,23 +75,6 @@ public class Spout implements IRichSpout, Serializable {
                 }
                 indexSamples++;
                 Utils.sleep(1000);
-                Redis redis = new Redis();
-                redis.setInputIndex(indexSamples);
-            }
-        }
-    }
-
-    class SaveIndex implements Runnable {
-        @Override
-        public void run() {
-            saveIndex();
-        }
-
-        public void saveIndex() {
-            while (true) {
-                Utils.sleep(10000);
-                Redis redis = new Redis();
-                redis.setInputIndex(indexSamples);
             }
         }
     }
@@ -102,25 +82,16 @@ public class Spout implements IRichSpout, Serializable {
     @Override
     public void close() {
         logger.info("Close");
-        Redis redis = new Redis();
-        redis.setInputIndex(this.indexSamples);
-        logger.info("Close Redis IndexSamples: " + this.indexSamples);
     }
 
     @Override
     public void activate() {
         logger.info("Activate");
-        Redis redis = new Redis();
-        this.indexSamples = redis.getInputIndex();
-        logger.info("Activate Redis IndexSamples: " + this.indexSamples);
     }
 
     @Override
     public void deactivate() {
         logger.info("Deactivate");
-        Redis redis = new Redis();
-        redis.setInputIndex(this.indexSamples);
-        logger.info("Deactivate Redis IndexSamples: " + this.indexSamples);
     }
 
 

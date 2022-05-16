@@ -1,6 +1,5 @@
 package com.github.dwladdimiroc.normalApp.bolt;
 
-import com.github.dwladdimiroc.normalApp.spout.Spout;
 import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
