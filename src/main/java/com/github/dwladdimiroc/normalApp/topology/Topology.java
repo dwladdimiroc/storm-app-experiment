@@ -20,7 +20,6 @@ public class Topology implements Serializable {
         int numParallelism = Integer.parseInt(args[1]);
 
         TopologyBuilder builder = new TopologyBuilder();
-        int numParallelism = Integer.parseInt(args[1]);
 
         // Set Spout
         builder.setSpout("Spout", new Spout(args[0], "BoltA"), 1);
