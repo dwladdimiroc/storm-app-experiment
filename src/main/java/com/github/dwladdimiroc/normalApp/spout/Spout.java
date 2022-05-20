@@ -1,8 +1,6 @@
 package com.github.dwladdimiroc.normalApp.spout;
 
 import com.github.dwladdimiroc.normalApp.util.Distribution;
-import com.github.dwladdimiroc.normalApp.util.Redis;
-import com.github.dwladdimiroc.normalApp.util.Replicas;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.IRichSpout;
@@ -51,14 +49,10 @@ public class Spout implements IRichSpout, Serializable {
 
         this.numReplicas = new AtomicInteger(1);
         this.events = 0;
-        Thread adaptiveBolt = new Thread(new Replicas(this.stream, this.numReplicas));
-        adaptiveBolt.start();
 
         Distribution file = new Distribution(this.distribution);
         this.samples = file.Input();
 
-        Redis redis = new Redis();
-        this.indexSamples = redis.getInputIndex();
         logger.info("Open Redis IndexSamples: " + this.indexSamples);
 
         Thread createTuples = new Thread(new TuplesCreator());
@@ -78,23 +72,6 @@ public class Spout implements IRichSpout, Serializable {
                 }
                 indexSamples++;
                 Utils.sleep(1000);
-                Redis redis = new Redis();
-                redis.setInputIndex(indexSamples);
-            }
-        }
-    }
-
-    class SaveIndex implements Runnable {
-        @Override
-        public void run() {
-            saveIndex();
-        }
-
-        public void saveIndex() {
-            while (true) {
-                Utils.sleep(10000);
-                Redis redis = new Redis();
-                redis.setInputIndex(indexSamples);
             }
         }
     }
@@ -102,25 +79,16 @@ public class Spout implements IRichSpout, Serializable {
     @Override
     public void close() {
         logger.info("Close");
-        Redis redis = new Redis();
-        redis.setInputIndex(this.indexSamples);
-        logger.info("Close Redis IndexSamples: " + this.indexSamples);
     }
 
     @Override
     public void activate() {
         logger.info("Activate");
-        Redis redis = new Redis();
-        this.indexSamples = redis.getInputIndex();
-        logger.info("Activate Redis IndexSamples: " + this.indexSamples);
     }
 
     @Override
     public void deactivate() {
         logger.info("Deactivate");
-        Redis redis = new Redis();
-        redis.setInputIndex(this.indexSamples);
-        logger.info("Deactivate Redis IndexSamples: " + this.indexSamples);
     }
 
 
@@ -130,13 +98,8 @@ public class Spout implements IRichSpout, Serializable {
         if (nums == null) {
             Utils.sleep(10);
         } else {
-            long idReplica = this.events % this.numReplicas.get();
-            long idReplica1 = 0;
-            long idReplica2 = 0;
-
-            Values values = new Values(Time.nanoTime(), idReplica, idReplica1, idReplica2);
+            Values values = new Values(Time.nanoTime());
             this.collector.emit("BoltA", values, values.get(0));
-//            this.collector.emit(values);
             this.events++;
         }
     }
@@ -151,7 +114,7 @@ public class Spout implements IRichSpout, Serializable {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("BoltA", new Fields("number", "id-replica", "data-1", "stream-2"));
+        declarer.declareStream("BoltA", new Fields("time"));
     }
 
     @Override

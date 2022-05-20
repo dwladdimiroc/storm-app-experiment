@@ -3,8 +3,7 @@ package com.github.dwladdimiroc.normalApp.util;
 import redis.clients.jedis.Jedis;
 
 public class Redis {
-    private static String REDIS_HOST = "10.132.0.31";
-//    private static final String REDIS_HOST = "localhost";
+     private static String REDIS_HOST = "10.132.0.31";
 
     public int getReplicas(String key) {
         Jedis jedis = new Jedis(REDIS_HOST);

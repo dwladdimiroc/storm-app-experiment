@@ -11,10 +11,13 @@ import java.io.Serializable;
 public class Topology implements Serializable {
     private static final String TOPOLOGY_NAME = "normalApp";
 
+
     public static void main(String[] args) {
         Config config = new Config();
         config.setMessageTimeoutSecs(120);
         config.setNumWorkers(7);
+
+        int numParallelism = Integer.parseInt(args[1]);
 
         TopologyBuilder builder = new TopologyBuilder();
         int numParallelism = Integer.parseInt(args[1]);
