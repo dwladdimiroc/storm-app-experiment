@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 public class Topology implements Serializable {
     private static final String TOPOLOGY_NAME = "normalApp";
-    private static final int NUM_PARALLELISM = 23;
+    private static final int NUM_PARALLELISM = 17;
 
     public static void main(String[] args) {
         Config config = new Config();
