@@ -24,19 +24,14 @@ public class Spout implements IRichSpout, Serializable {
     private SpoutOutputCollector collector;
 
     private LinkedBlockingQueue<Integer> queue;
-    private String distribution;
+    private final String distribution;
     private float[] samples;
     private int indexSamples;
-
-    private AtomicInteger numReplicas;
-    private long events;
     private String stream;
 
-    private String id;
-
     public Spout(String distribution, String stream) {
-        this.distribution = distribution;
         this.stream = stream;
+        this.distribution = distribution;
     }
 
     @Override
@@ -44,16 +39,11 @@ public class Spout implements IRichSpout, Serializable {
         this.conf = conf;
         this.context = context;
         this.collector = collector;
-        this.id = context.getThisComponentId();
-        this.queue = new LinkedBlockingQueue<Integer>(100000);
-
-        this.numReplicas = new AtomicInteger(1);
-        this.events = 0;
+        this.queue = new LinkedBlockingQueue<Integer>(500000);
 
         Distribution file = new Distribution(this.distribution);
         this.samples = file.Input();
-
-        logger.info("Open Redis IndexSamples: " + this.indexSamples);
+        this.indexSamples = 0;
 
         Thread createTuples = new Thread(new TuplesCreator());
         createTuples.start();
@@ -98,9 +88,8 @@ public class Spout implements IRichSpout, Serializable {
         if (nums == null) {
             Utils.sleep(10);
         } else {
-            Values values = new Values(Time.nanoTime());
-            this.collector.emit("BoltA", values, values.get(0));
-            this.events++;
+            Values values = new Values(Time.currentTimeMillis());
+            this.collector.emit(stream, values, values.get(0));
         }
     }
 
