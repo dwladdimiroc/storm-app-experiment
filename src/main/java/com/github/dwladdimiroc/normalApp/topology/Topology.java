@@ -17,7 +17,7 @@ public class Topology implements Serializable {
     public static final int NUM_REPLICAS = 23;
     public static final int NUM_WORKERS = 7;
     public static final int QUEUE_SIZE = 1000000;
-    public static final int TIMEOUT = 360;
+    public static final int TIMEOUT = 30;
     public static final int TIMEOUT_MS = TIMEOUT*1000;
 
     public static void main(String[] args) {
